@@ -6,6 +6,7 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WatchlistController;
+use App\Http\Controllers\RecentlistController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -23,4 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/watchlist', [WatchlistController::class, 'index']);
     Route::post('/watchlist', [WatchlistController::class, 'store']);
     Route::delete('/watchlist/{type}/{tmdb_id}', [WatchlistController::class, 'destroy']);
+
+    Route::get('/recentlist', [RecentlistController::class, 'index']);
+    Route::post('/recentlist', [RecentlistController::class, 'store']);
+    Route::delete('/recentlist/{type}/{tmdb_id}', [RecentlistController::class, 'destroy']);
 });

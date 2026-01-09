@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('watchlists', function (Blueprint $table) {
-             $table->id();
+        Schema::create('recentlists', function (Blueprint $table) {
+            $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('type');
             $table->unsignedBigInteger('tmdb_id');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('watchlists');
+        Schema::dropIfExists('recentlists');
     }
 };
