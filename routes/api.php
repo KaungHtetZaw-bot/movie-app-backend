@@ -1,0 +1,21 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\AuthController;
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/media/trending', [MediaController::class, 'trending']);
+Route::get('/media/popular/{type}', [MediaController::class, 'popular']);
+Route::get('/media/search', [MediaController::class, 'search']);
+Route::get('/media/{type}/{id}', [MediaController::class, 'details']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/favorites', [FavoriteController::class, 'index']);
+    Route::post('/favorites', [FavoriteController::class, 'store']);
+    Route::delete('/favorites/{type}/{tmdb_id}', [FavoriteController::class, 'destroy']);
+});
