@@ -38,6 +38,22 @@ class TMDBService
         ])->json()['results'];
     }
 
+    public function genres(string $type = 'movie')
+    {
+        return Http::get("{$this->baseUrl}/genre/{$type}/list", [
+            'api_key' => $this->apiKey,
+        ])->json()['genres'];
+    }
+
+    public function discoverByGenre(string $type, int $genreId, int $page = 1)
+    {
+        return Http::get("{$this->baseUrl}/discover/{$type}", [
+            'api_key' => $this->apiKey,
+            'with_genres' => $genreId,
+            'page' => $page,
+        ])->json()['results'];
+    }
+
     public function details(int $id, string $type)
     {
         if (!in_array($type, ['movie', 'tv'])) {
