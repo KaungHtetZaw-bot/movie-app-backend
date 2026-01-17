@@ -7,6 +7,7 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\RecentlistController;
+use App\Http\Controllers\PlanController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -31,4 +32,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/recentlist', [RecentlistController::class, 'index']);
     Route::post('/recentlist', [RecentlistController::class, 'store']);
     Route::delete('/recentlist/{type}/{tmdb_id}', [RecentlistController::class, 'destroy']);
+
+    Route::get('/plans',[PlanController::class, 'index']);
 });
