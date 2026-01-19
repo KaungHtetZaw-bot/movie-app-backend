@@ -9,6 +9,7 @@ use App\Http\Controllers\WatchlistController;
 use App\Http\Controllers\RecentlistController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PurchaseController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -36,4 +37,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/plans',[PlanController::class, 'index']);
     Route::get('/payments',[PaymentController::class, 'index']);
+
+    Route::post('/purchases', [PurchaseController::class, 'store']);
 });
