@@ -46,4 +46,10 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::patch('/purchases/{id}/approve', [PurchaseController::class, 'approve']);
     Route::patch('/purchases/{id}/reject', [PurchaseController::class, 'reject']);
+    Route::patch('/plans/{id}', [PlanController::class, 'change']);
+    Route::post('/plans', [PlanController::class, 'add']);
+    Route::delete('/plans/{id}', [PlanController::class, 'delete']);
+    Route::patch('/payments/{id}', [PaymentController::class, 'change']);
+    Route::post('/payments', [PaymentController::class, 'add']);
+    Route::delete('/payments/{id}', [PaymentController::class, 'delete']);
 });
