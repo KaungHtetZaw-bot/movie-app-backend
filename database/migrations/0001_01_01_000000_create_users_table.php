@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('role_id');
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('vip')->default(false);
-            $table->date('vip_duration')->nullable();;
+            $table->boolean('is_vip')->default(false);
+            $table->date('vip_expires_at')->nullable();;
             $table->rememberToken();
             $table->timestamps();
         });

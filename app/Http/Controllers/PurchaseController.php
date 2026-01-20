@@ -12,13 +12,12 @@ class PurchaseController extends Controller
     {
         $validated = $request->validate([
             'plan_id' => 'required|exists:plans,id',
-            'photo'   => 'required|image|mimes:jpg,jpeg,png|max:5120',
+            'photo'   => 'required|image|mimes:jpg,jpeg,png|max:10240',
         ]);
             
         $user = $request->user();
         $plan = Plan::findOrFail($validated['plan_id']);
 
-        // Correct field name
         $screenshot = $request->file('photo')->store('purchases', 'public');
 
         $purchase = Purchase::create([
@@ -32,6 +31,57 @@ class PurchaseController extends Controller
         return response()->json([
             'message' => 'Purchase submitted. Awaiting admin approval.',
             'purchase' => $purchase,
-        ], 201); // ✅ Now Laravel WILL return 201
+        ], 201);
+    }
+
+    public function approve(Request $request,$id)
+    {
+        $validated = $request->validate([
+            'provider_id' => 'required|exists:users,id',
+        ]);
+
+        $purchase = Purchase::findOrFail($id);
+
+        if($purchase->status !== 'pending'){
+            return response()->json([
+                'status'  => false,
+                'message' => 'Purchase already processed',
+            ], 400);
+        }
+
+        $purchase->update([
+            'status' => 'approved',
+            'provider_id' => $validated['provider_id']
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Purchase approved successfully',
+        ]);
+    }
+    public function reject(Request $request,$id)
+    {
+        $validated = $request->validate([
+            'provider_id' => 'required|exists:users,id',
+        ]);
+
+        $purchase = Purchase::findOrFail($id);
+
+        if($purchase->status !== 'pending'){
+            return response()->json([
+                'status'  => false,
+                'message' => 'Purchase already processed',
+            ], 400);
+        }
+
+        $purchase->update([
+            'status' => 'rejected',
+            'provider_id' => $validated['provider_id']
+        ]);
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Purchase rejected',
+        ]);
     }
 }
