@@ -23,7 +23,6 @@ class PlanController extends Controller
             return response()->json([
                 'status' => false, 
                 'message' => 'Unauthorized. Admin access required.',
-                'data'    => $user
             ], 403);
         }
         $validated = $request->validate([
@@ -49,7 +48,6 @@ class PlanController extends Controller
             return response()->json([
                 'status' => false, 
                 'message' => 'Unauthorized. Admin access required.',
-                'data'    => $user
             ], 403);
         }
         $validated = $request->validate([
@@ -74,7 +72,6 @@ class PlanController extends Controller
             return response()->json([
                 'status' => false, 
                 'message' => 'Unauthorized. Admin access required.',
-                'data'    => $user
             ], 403);
         }
         $plan = Plan::findOrFail($id);
