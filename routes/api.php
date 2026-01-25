@@ -13,10 +13,12 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PurchaseController;
 
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'index']);
+    Route::get('/edit/user/{id}', [UserController::class, 'edit']);
     Route::get('/media/trending', [MediaController::class, 'trending']);
     Route::get('/media/popular/{type}', [MediaController::class, 'popular']);
     Route::get('/media/search', [MediaController::class, 'search']);
@@ -40,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/plans',[PlanController::class, 'index']);
     Route::get('/payments',[PaymentController::class, 'index']);
 
+    Route::get('/purchases', [PurchaseController::class, 'index']);
     Route::post('/purchases', [PurchaseController::class, 'store']);
 });
 

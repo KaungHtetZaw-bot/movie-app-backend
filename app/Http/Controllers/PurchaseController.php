@@ -8,6 +8,13 @@ use App\Models\Plan;
 
 class PurchaseController extends Controller
 {
+    public function index()
+    {
+        return response()->json([
+            'status'=>true,
+            'data'=>Purchase::all()
+        ]);
+    }
     public function store(Request $request)
     {
         $validated = $request->validate([

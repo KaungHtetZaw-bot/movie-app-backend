@@ -21,4 +21,27 @@ class UserController extends Controller
             'data'=>$user
         ]);
     }
+
+    public function edit(Request $request)
+    {
+        $validated = $request->validate([
+            'id' => 'required|exists:users,id',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+        $user = User::findOrFail($request->id);
+        $requestUser = Auth::user();
+        if($requestUser->role_id <= $user->role_id){
+            return response()->json([
+                'message' => 'Unauthorized',
+            ], 403);
+        };  
+        $user->update([
+            'role_id' => $request->role_id,
+        ]);
+
+        return response()->json([
+            'user' => $user,
+            'can_edit' => $requestUser->role_id > $user->role_id
+        ]);
+    }
 }
