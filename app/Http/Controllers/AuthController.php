@@ -9,11 +9,33 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+    public function profile()
+    {
+        $user = Auth::user();
+        $user->load('role');
+
+        return response()->json([
+            'success' => true,
+            'user' => $user
+        ], 200);
+    }
     public function register(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email:rfc,dns|unique:users,email|regex:/^.+@gmail\.com$/i',
+        ],
+        [
+            'email.email' => 'That email format is invalid.',
+            'email.unique' => 'The email has already been taken.'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()->first()], 422);
+        }
         $verification = rand(100000,600000);
 
         Cache::put('verification_code_' . $request->email, $verification, now()->addMinutes(3));
@@ -68,6 +90,14 @@ class AuthController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
+
+        if ($user->role_id === 1) {
+            return response()->json([
+                'message' => 'Access Restricted: Administrator Only'
+            ], 403); 
+        }
+
+        $user->load('role');
 
         return response()->json([
             'token' => $user->createToken('api')->plainTextToken,

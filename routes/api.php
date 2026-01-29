@@ -17,8 +17,11 @@ Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/profile', [AuthController::class, 'profile']);
+    Route::get('/user/{$id}', [UserController::class, 'currentUser']);
     Route::get('/users', [UserController::class, 'index']);
-    Route::get('/edit/user/{id}', [UserController::class, 'edit']);
+    Route::patch('/users/{id}/change-profile', [UserController::class, 'edit']);
+    Route::patch('/users/{id}/change-password', [UserController::class, 'changePassword']);
     Route::get('/media/trending', [MediaController::class, 'trending']);
     Route::get('/media/popular/{type}', [MediaController::class, 'popular']);
     Route::get('/media/search', [MediaController::class, 'search']);
