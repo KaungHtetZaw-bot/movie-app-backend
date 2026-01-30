@@ -11,17 +11,22 @@ class UserController extends Controller
 {
     public function index()
     {
-        $currentUser = Auth::user();
+        $currentUser = auth('api')->user();
 
-        $user = User::query()->when($currentUser->role_id == 2,function ($query){
-            return $query->where('role_id',1);
-        })->when($currentUser->role_id == 3,function ($query){
-            return $query->where('role_id',[1,2]);
-        })->get();
-        
+        $users = User::query()
+            ->when($currentUser->role_id == 2, function ($query) {
+                return $query->where('role_id', 1);
+            })
+            ->when($currentUser->role_id == 3, function ($query) {
+                return $query->whereIn('role_id', [1, 2]);
+            })
+            ->with('role')
+            ->latest()
+            ->get();
+
         return response()->json([
-            'status'=>true,
-            'data'=>$user
+            'status' => true,
+            'data' => $users
         ]);
     }
 
