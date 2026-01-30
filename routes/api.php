@@ -16,12 +16,15 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:api')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
-    Route::get('/user/{$id}', [UserController::class, 'currentUser']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+    
     Route::get('/users', [UserController::class, 'index']);
-    Route::patch('/users/{id}/change-profile', [UserController::class, 'edit']);
+    Route::patch('/users/{id}/change-profile', [UserController::class, 'changeProfile']);
     Route::patch('/users/{id}/change-password', [UserController::class, 'changePassword']);
+
     Route::get('/media/trending', [MediaController::class, 'trending']);
     Route::get('/media/popular/{type}', [MediaController::class, 'popular']);
     Route::get('/media/search', [MediaController::class, 'search']);
@@ -49,7 +52,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/purchases', [PurchaseController::class, 'store']);
 });
 
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+Route::middleware(['auth:api', 'admin'])->group(function () {
     Route::patch('/purchases/{id}/approve', [PurchaseController::class, 'approve']);
     Route::patch('/purchases/{id}/reject', [PurchaseController::class, 'reject']);
     Route::patch('/plans/{id}', [PlanController::class, 'change']);

@@ -6,12 +6,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements MustVerifyEmail,JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -49,6 +49,16 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function getJWTIdentifier(){
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(){
+        return [
+            'role' =>$this->role?->name,
+        ];
+    }
+
     public function role()
     {
         return $this->belongsTo(Role::class);
@@ -56,16 +66,16 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isUser(): bool
     {
-        return $this->role?->name === 'user';
+        return $this->role?->name === 'User';
     }
 
     public function isAdmin(): bool
     {
-        return in_array($this->role?->name, ['admin', 'super_admin']);
+        return in_array($this->role?->name, ['Admin', 'Super Admin']);
     }
 
     public function isSuperAdmin(): bool
     {
-        return $this->role?->name === 'super_admin';
+        return $this->role?->name === 'Super Admin';
     }
 }

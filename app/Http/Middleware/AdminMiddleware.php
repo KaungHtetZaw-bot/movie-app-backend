@@ -10,13 +10,20 @@ class AdminMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        // Explicitly check the 'api' guard for JWT users
+        $user = auth('api')->user();
+
+        // 1. Check if user is logged in via JWT
+        // 2. Check if the user has admin/super_admin role via the helper in User model
+        if (!$user || !$user->isAdmin()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Forbidden: You do not have administrative privileges.',
+                'code' => 403
+            ], 403);
         }
 
         return $next($request);

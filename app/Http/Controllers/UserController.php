@@ -25,7 +25,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function edit(Request $request, $id)
+    public function changeProfile(Request $request, $id)
     {
         $targetUser = User::findOrFail($id);
         $authUser = Auth::user();
