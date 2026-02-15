@@ -11,18 +11,16 @@ class RecentlistController extends Controller
 {
     public function index(TMDBService $tmdb)
     {
-        $recentlist = Recentlist::where('user_id', auth()->id())->get();
+        $recentlist = Recentlist::where('user_id', auth()->id())
+            ->orderBy('updated_at', 'desc')
+            ->take(20)
+            ->get();
 
         $data = $recentlist->map(function ($item) use ($tmdb) {
-            $details = $tmdb->details($item->tmdb_id, $item->type);
-
-            return [
-                'id' => $details['id'],
-                'type' => $item->type,
-                'title' => $details['title'] ?? $details['name'] ?? '',
-                'poster' => $details['poster_path'] ?? null,
-                'rating' => $details['vote_average'] ?? null,
-            ];
+            $cacheKey = "tmdb_details_{$item->type}_{$item->tmdb_id}";
+            return cache()->remember($cacheKey, now()->addWeek(), function () use ($tmdb, $item) {
+                return $tmdb->details($item->tmdb_id, $item->type);
+            });
         });
 
         return response()->json($data);
