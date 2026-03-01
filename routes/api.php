@@ -15,6 +15,7 @@ use App\Http\Controllers\PurchaseController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 Route::post('/login', [AuthController::class, 'login']);
+    Route::get('/media/trending', [MediaController::class, 'trending']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
@@ -25,13 +26,12 @@ Route::middleware('auth:api')->group(function () {
     Route::patch('/users/{id}/change-profile', [UserController::class, 'changeProfile']);
     Route::patch('/users/{id}/change-password', [UserController::class, 'changePassword']);
 
-    Route::get('/media/trending', [MediaController::class, 'trending']);
     Route::get('/media/popular/{type}', [MediaController::class, 'popular']);
     Route::get('/media/search', [MediaController::class, 'search']);
     Route::get('/genres/{type}', [MediaController::class, 'genres']);
     Route::get('/media/genre/{type}/{genreId}', [MediaController::class, 'byGenre']);
 
-    Route::get('/media/{type}/{id}', [MediaController::class, 'details']);
+    Route::get('/media/detail/{type}/{id}', [MediaController::class, 'details']);
 
     Route::get('/favorites', [FavoriteController::class, 'index']);
     Route::post('/favorites', [FavoriteController::class, 'store']);
@@ -43,7 +43,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/recentlist', [RecentlistController::class, 'index']);
     Route::post('/recentlist', [RecentlistController::class, 'store']);
-    Route::delete('/recentlist/{type}/{tmdb_id}', [RecentlistController::class, 'destroy']);
+    Route::delete('/recentlist', [RecentlistController::class, 'destroy']);
 
     Route::get('/plans',[PlanController::class, 'index']);
     Route::get('/payments',[PaymentController::class, 'index']);

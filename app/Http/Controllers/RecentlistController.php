@@ -5,49 +5,64 @@ namespace App\Http\Controllers;
 use App\Models\Recentlist;
 use App\Services\TMDBService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 
 class RecentlistController extends Controller
 {
     public function index(TMDBService $tmdb)
     {
-        $recentlist = Recentlist::where('user_id', auth()->id())
-            ->orderBy('updated_at', 'desc')
+         $recentlist = Recentlist::where('user_id', auth()->id())
+            ->latest()
             ->take(20)
             ->get();
 
-        $data = $recentlist->map(function ($item) use ($tmdb) {
-            $cacheKey = "tmdb_details_{$item->type}_{$item->tmdb_id}";
-            return cache()->remember($cacheKey, now()->addWeek(), function () use ($tmdb, $item) {
-                return $tmdb->details($item->tmdb_id, $item->type);
-            });
-        });
-
-        return response()->json($data);
+        return response()->json([
+            'results' => $recentlist,
+            'page' => 1,
+            'total_pages' => 1,
+            'total_results' => $recentlist->count(),
+        ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request, TMDBService $tmdb)
+{
+    $data = $request->validate([
+        'type' => 'required|in:movie,tv',
+        'tmdb_id' => 'required|integer',
+    ]);
+
+    $details = $tmdb->details($data['tmdb_id'], $data['type']);
+
+    Recentlist::updateOrCreate(
+        [
+            'user_id' => auth()->id(),
+            'tmdb_id' => $data['tmdb_id'],
+            'type' => $data['type'],
+        ],
+        [
+            'title' => $details['title'] ?? $details['name'] ?? null,
+            'poster_path' => $details['poster_path'] ?? null,
+            'vote_average' => $details['vote_average'] ?? null,
+        ]
+    );
+
+    return response()->json([
+        'message' => 'Added',
+        'details' => $details['title'] ?? $details['name'] ?? null,
+    ]);
+}
+
+    public function destroy(Request $request)
     {
         $data = $request->validate([
             'type' => 'required|in:movie,tv',
             'tmdb_id' => 'required|integer',
         ]);
-
-        Recentlist::firstOrCreate([
+        Recentlist::where([
             'user_id' => auth()->id(),
             'type' => $data['type'],
             'tmdb_id' => $data['tmdb_id'],
-        ]);
-
-        return response()->json(['message' => 'Added to recentlist'], 201);
-    }
-
-    public function destroy(string $type, int $tmdb_id)
-    {
-        Recentlist::where([
-            'user_id' => auth()->id(),
-            'type' => $type,
-            'tmdb_id' => $tmdb_id,
         ])->delete();
 
         return response()->json(['message' => 'Removed from recentlist']);

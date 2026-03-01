@@ -16,8 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('type');
             $table->unsignedBigInteger('tmdb_id');
+            $table->string('title')->nullable();
+            $table->string('poster_path')->nullable();
+            $table->decimal('vote_average', 3, 1)->nullable();
             $table->timestamps();
-
             $table->unique(['user_id', 'type', 'tmdb_id']);
         });
     }

@@ -13,6 +13,9 @@ class Recentlist extends Model
         'user_id',
         'type',
         'tmdb_id',
+        'title',
+        'poster_path',
+        'vote_average',
     ];
 
     public function user()
