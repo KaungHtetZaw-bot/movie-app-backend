@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\support\facades\DB;
+use App\Models\PaymentType;
+use App\Models\Payment;
 
 class PaymentSeeder extends Seeder
 {
@@ -13,21 +15,42 @@ class PaymentSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('payments')->insert([
-            [
-            'type' => 'KBZ Pay',
-            'name' => 'Kaung Htet Zaw',
-            'number' => "09967922343",
-            'created_at' => now(),
-            'updated_at' => now(),
-            ],
-            [
-                'type' => 'Wave Pay',
-                'name' => 'Kaung Htet Zaw',
-                'number' => "09967922343",
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+        {
+        // 1. Create the Payment Providers (The "Types")
+        $kbzPay = PaymentType::create([
+            'name' => 'KBZ Pay',
+            'logo_url' => 'https://example.com/logos/kbzpay.png'
         ]);
+
+        $wavePay = PaymentType::create([
+            'name' => 'Wave Money',
+            'logo_url' => 'https://example.com/logos/wavepay.png'
+        ]);
+
+        $ayapay = PaymentType::create([
+            'name' => 'AYA Pay',
+            'logo_url' => 'https://example.com/logos/ayapay.png'
+        ]);
+
+        // 2. Create the specific Account Details (The "Payments")
+        // These are linked via payment_type_id
+        Payment::create([
+            'payment_type_id' => $kbzPay->id,
+            'name'   => 'U Mg Mg (Admin)',
+            'number' => '09123456789'
+        ]);
+
+        Payment::create([
+            'payment_type_id' => $wavePay->id,
+            'name'   => 'Daw Hla Hla (Admin)',
+            'number' => '09987654321'
+        ]);
+
+        Payment::create([
+            'payment_type_id' => $kbzPay->id,
+            'name'   => 'Office Account 2',
+            'number' => '09444555666'
+        ]);
+    }
     }
 }

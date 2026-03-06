@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\models\Payment;
+use App\Models\PaymentType;
 
 class PaymentController extends Controller
 {
@@ -12,7 +13,7 @@ class PaymentController extends Controller
     {
         return response()->json([
             'status'=>true,
-            'data'=>Payment::all()
+            'data'   => Payment::with('paymentType')->get()
         ]);
     }
 
@@ -28,7 +29,7 @@ class PaymentController extends Controller
             ], 403);
         }
         $validated = $request->validate([
-            'type' => 'sometimes|required|string',
+            'payment_type_id' => 'required|exists:payment_types,id',
             'name' => 'sometimes|required|string',
             'number' => 'sometimes|required|string',
         ]);
@@ -38,8 +39,9 @@ class PaymentController extends Controller
         $Payment->update($validated);
 
         return response()->json([
-            'message' => 'payment updated successfully',
-            'data'    => $Payment,
+            'status'  => true,
+            'message' => 'Payment account added successfully',
+            'data'    => $payment->load('paymentType')
         ], 200);
     }
 
@@ -54,7 +56,7 @@ class PaymentController extends Controller
             ], 403);
         }
         $validated = $request->validate([
-            'name' => 'sometimes|required|string',
+            'payment_type_id' => 'sometimes|required|exists:payment_types,id',
             'amount' => 'sometimes|required|integer',
             'month' => 'sometimes|required|integer',
         ]);
@@ -64,8 +66,8 @@ class PaymentController extends Controller
         return response()->json([
             'status'  => true,
             'message' => 'Payment created successfully',
-            'data'    => $Payment
-        ], 201);
+            'data'    => $payment->load('paymentType'),
+        ], 200);
     }
 
     public function delete($id){
