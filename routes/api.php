@@ -4,13 +4,11 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MediaController;
-use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\WatchlistController;
-use App\Http\Controllers\RecentlistController;
 use App\Http\Controllers\PlanController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\UserMediaController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
@@ -33,21 +31,15 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/media/detail/{type}/{id}', [MediaController::class, 'details']);
 
-    Route::get('/favorites', [FavoriteController::class, 'index']);
-    Route::post('/favorites', [FavoriteController::class, 'store']);
-    Route::delete('/favorites/{type}/{tmdb_id}', [FavoriteController::class, 'destroy']);
-
-    Route::get('/watchlist', [WatchlistController::class, 'index']);
-    Route::post('/watchlist', [WatchlistController::class, 'store']);
-    Route::delete('/watchlist/{type}/{tmdb_id}', [WatchlistController::class, 'destroy']);
-
-    Route::get('/recentlist', [RecentlistController::class, 'index']);
-    Route::post('/recentlist', [RecentlistController::class, 'store']);
-    Route::delete('/recentlist', [RecentlistController::class, 'destroy']);
+    Route::prefix('user/lists')->group(function () {
+        Route::get('{type}', [UserMediaController::class,'index']);
+        Route::post('{type}', [UserMediaController::class,'store']);
+        Route::delete('{type}/{media_type}/{tmdb_id}',
+            [UserMediaController::class,'destroy']);
+    });
 
     Route::get('/plans',[PlanController::class, 'index']);
     Route::get('/payments',[PaymentController::class, 'index']);
-
     Route::get('/purchases', [PurchaseController::class, 'index']);
     Route::post('/purchases', [PurchaseController::class, 'store']);
 });
