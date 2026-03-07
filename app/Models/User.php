@@ -23,7 +23,9 @@ class User extends Authenticatable implements MustVerifyEmail,JWTSubject
         'email',
         'password',
         'role_id',
-        'email_verified_at'
+        'email_verified_at',
+        'is_vip',
+        'vip_expires_at',
     ];
 
     /**
@@ -71,7 +73,7 @@ class User extends Authenticatable implements MustVerifyEmail,JWTSubject
 
     public function isAdmin(): bool
     {
-        return in_array($this->role?->name, ['Admin', 'Super Admin']);
+        return in_array($this->role_id, [2]); 
     }
 
     public function isSuperAdmin(): bool

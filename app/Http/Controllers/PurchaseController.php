@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Purchase;
 use App\Models\Plan;
+use App\Models\User;
 
 class PurchaseController extends Controller
 {
@@ -61,9 +62,17 @@ class PurchaseController extends Controller
             'provider_id' => $validated['provider_id']
         ]);
 
+        $customer = User::find($purchase->user_id);
+
+        $customer->update([
+            'is_vip' => 1,
+            'vip_expires_at' => now()->addDays($purchase->plan->month),
+        ]);
+
         return response()->json([
             'status'  => true,
             'message' => 'Purchase approved successfully',
+            'customer' => $customer,
         ]);
     }
     public function reject(Request $request,$id)
