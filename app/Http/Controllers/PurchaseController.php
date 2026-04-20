@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PurchaseApproved;
+use App\Events\PurchaseRejected;
 use Illuminate\Http\Request;
 use App\Models\Purchase;
 use App\Models\Plan;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
 class PurchaseController extends Controller
 {
@@ -49,6 +52,7 @@ class PurchaseController extends Controller
         ]);
 
         $purchase = Purchase::findOrFail($id);
+        $purchase->loadMissing('plan');
 
         if($purchase->status !== 'pending'){
             return response()->json([
@@ -66,8 +70,18 @@ class PurchaseController extends Controller
 
         $customer->update([
             'is_vip' => 1,
-            'vip_expires_at' => now()->addDays($purchase->plan->month),
+            'vip_expires_at' => $customer->vip_expires_at 
+                ? Carbon::parse($customer->vip_expires_at)->addDays($purchase->plan->month) 
+                : now()->addDays($purchase->plan->month),
         ]);
+
+        $customer = $customer->fresh(['role']);
+
+        event(new PurchaseApproved(
+            $customer->id,
+            $customer->toArray(),
+            $purchase->id,
+        ));
 
         return response()->json([
             'status'  => true,
@@ -94,6 +108,8 @@ class PurchaseController extends Controller
             'status' => 'rejected',
             'provider_id' => $validated['provider_id']
         ]);
+
+        event(new PurchaseRejected((int) $purchase->user_id, (int) $purchase->id));
 
         return response()->json([
             'status'  => true,
