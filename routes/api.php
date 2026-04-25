@@ -13,12 +13,12 @@ use App\Http\Controllers\UserMediaController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/verify-code', [AuthController::class, 'verifyCode']);
 Route::post('/login', [AuthController::class, 'login']);
-    Route::get('/media/trending', [MediaController::class, 'trending']);
+Route::post('/refresh', [AuthController::class, 'refresh']);
+Route::get('/media/trending', [MediaController::class, 'trending']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
     
     Route::get('/users', [UserController::class, 'index']);
     Route::patch('/users/{id}/change-profile', [UserController::class, 'changeProfile']);
@@ -34,8 +34,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('user/lists')->group(function () {
         Route::get('{type}', [UserMediaController::class,'index']);
         Route::post('{type}', [UserMediaController::class,'store']);
-        Route::delete('{type}/{media_type}/{tmdb_id}',
-            [UserMediaController::class,'destroy']);
+        Route::delete('{type}/{media_type}/{tmdb_id}', [UserMediaController::class,'destroy']);
     });
 
     Route::get('/plans',[PlanController::class, 'index']);
