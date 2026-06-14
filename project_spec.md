@@ -6,8 +6,8 @@ CinePrism is a premium cinematic movie and TV show streaming application. The ba
 
 ## 1. Core Technology Stack
 
-*   **Framework:** Laravel 11.x
-*   **Language:** PHP 8.2+
+*   **Framework:** Laravel 13.x
+*   **Language:** PHP 8.3+
 *   **Authentication:** JWT-Auth via `tymon/jwt-auth`
 *   **WebSockets Server:** Laravel Reverb (first-party WebSocket server)
 *   **Database ORM:** Eloquent ORM
