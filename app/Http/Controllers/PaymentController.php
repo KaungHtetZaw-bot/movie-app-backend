@@ -29,14 +29,14 @@ class PaymentController extends Controller
             ], 403);
         }
         $validated = $request->validate([
-            'payment_type_id' => 'required|exists:payment_types,id',
-            'name' => 'sometimes|required|string',
-            'number' => 'sometimes|required|string',
+            'payment_type_id' => 'sometimes|required|exists:payment_types,id',
+            'name' => 'sometimes|required|string|unique:payments,name,'.$id.',id,deleted_at,NULL',
+            'number' => 'sometimes|required|string|unique:payments,number,'.$id.',id,deleted_at,NULL',
         ]);
 
-        $Payment = Payment::findOrFail($id);
+        $payment = Payment::findOrFail($id);
 
-        $Payment->update($validated);
+        $payment->update($validated);
 
         return response()->json([
             'status'  => true,
@@ -57,17 +57,17 @@ class PaymentController extends Controller
         }
         $validated = $request->validate([
             'payment_type_id' => 'sometimes|required|exists:payment_types,id',
-            'amount' => 'sometimes|required|integer',
-            'month' => 'sometimes|required|integer',
+            'name' => 'sometimes|required|string|unique:payments,name',
+            'number' => 'sometimes|required|string|unique:payments,number',
         ]);
 
-        $Payment = Payment::create($validated);
+        $payment = Payment::create($validated);
 
         return response()->json([
             'status'  => true,
             'message' => 'Payment created successfully',
             'data'    => $payment->load('paymentType'),
-        ], 200);
+        ], 201);
     }
 
     public function delete($id){
@@ -80,8 +80,8 @@ class PaymentController extends Controller
                 'data'    => $user
             ], 403);
         }
-        $Payment = Payment::findOrFail($id);
-        $Payment->delete();
+        $payment = Payment::findOrFail($id);
+        $payment->delete();
 
         return response()->json([
             'status'  => true,

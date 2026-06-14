@@ -135,7 +135,10 @@ class TMDBService
                     'api_key' => $this->apiKey,
                 ])->json();
 
-                return $response['genres'] ?? [];
+                return [
+                    'results' => $response['genres'] ?? [],
+                    'response' => $response
+                ];
             }
         );
     }

@@ -15,7 +15,7 @@ class MediaController extends Controller
         return response()->json($this->tmdb->trendingAll($page));
     }
 
-    public function popular(Request $request,$type)
+    public function popular(Request $request,string $type)
     {
         $page = (int) $request->query('page', 1);
         if (!in_array($type, ['movie', 'tv'])) {
@@ -55,7 +55,7 @@ class MediaController extends Controller
         );
     }
 
-    public function details($type, $id)
+    public function details(string $type,string $id)
     {
         if (!in_array($type, ['movie', 'tv'])) {
             return response()->json(['error' => 'Invalid media type'], 400);

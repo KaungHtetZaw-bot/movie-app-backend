@@ -2,14 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Role;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\MediaController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PlanController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\UserMediaController;
+use App\Mail\OtpMail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -50,9 +58,7 @@ class AuthController extends Controller
         Cache::put('verification_code_' . $request->email, $verification, now()->addMinutes(5));
 
         try {
-            Mail::raw("Your Cinema Admin Verification Code is: $verification", function ($message) use ($request) {
-                $message->to($request->email)->subject('Verification Code');
-            });
+            Mail::to($request->email)->queue(new OtpMail($verification));
             return response()->json(['message' => 'Code sent to email']);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Failed to send code', 'error' => $e->getMessage()], 500);

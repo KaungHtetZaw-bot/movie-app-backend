@@ -71,8 +71,8 @@ class PurchaseController extends Controller
         $customer->update([
             'is_vip' => 1,
             'vip_expires_at' => $customer->vip_expires_at 
-                ? Carbon::parse($customer->vip_expires_at)->addDays($purchase->plan->month) 
-                : now()->addDays($purchase->plan->month),
+                ? Carbon::parse($customer->vip_expires_at)->addMonths($purchase->plan->month) 
+                : now()->addMonths($purchase->plan->month),
         ]);
 
         $customer = $customer->fresh(['role']);

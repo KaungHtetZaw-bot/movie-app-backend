@@ -26,7 +26,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::get('/media/popular/{type}', [MediaController::class, 'popular']);
     Route::get('/media/search', [MediaController::class, 'search']);
-    Route::get('/genres/{type}', [MediaController::class, 'genres']);
+    Route::get('/media/genres/{type}', [MediaController::class, 'genres']);
     Route::get('/media/genre/{type}/{genreId}', [MediaController::class, 'byGenre']);
 
     Route::get('/media/detail/{type}/{id}', [MediaController::class, 'details']);

@@ -28,6 +28,11 @@ class User extends Authenticatable implements MustVerifyEmail,JWTSubject
         'vip_expires_at',
     ];
 
+    public function userMedia()
+    {
+        return $this->hasMany(UserMedia::class);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -68,16 +73,18 @@ class User extends Authenticatable implements MustVerifyEmail,JWTSubject
 
     public function isUser(): bool
     {
-        return $this->role?->name === 'User';
+        return $this->role?->name === 'user';
     }
 
     public function isAdmin(): bool
     {
-        return in_array($this->role_id, [2]); 
+        return in_array($this->role_id, [2, 3]); 
     }
 
     public function isSuperAdmin(): bool
     {
-        return $this->role?->name === 'Super Admin';
+        return $this->role?->name === 'super_admin';
     }
+
+    
 }

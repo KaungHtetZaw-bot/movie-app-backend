@@ -9,12 +9,13 @@ class UserMediaController extends Controller
 {
     public function index(string $type)
     {
-        $items = UserMedia::where([
-            'user_id' => auth()->id(),
+        $items = auth('api')
+        ->user()
+        ->userMedia()
+        ->where([
             'list_type' => $type
-        ])
+            ])
         ->latest()
-        ->take(20)
         ->get();
 
         return response()->json([
@@ -22,41 +23,54 @@ class UserMediaController extends Controller
         ]);
     }
 
-    public function store(Request $request, string $type, TMDBService $tmdb)
+    public function store(Request $request, string $list_type, TMDBService $tmdb)
     {
         $data = $request->validate([
             'media_type' => 'required|in:movie,tv',
             'tmdb_id' => 'required|integer'
         ]);
 
-        $details = $tmdb->details($data['tmdb_id'], $data['media_type']);
+        $listCount = auth('api')->user()->userMedia()->where('list_type', $list_type)->count();
 
-        UserMedia::updateOrCreate(
-            [
-                'user_id' => auth()->id(),
-                'list_type' => $type,
-                'media_type' => $data['media_type'],
-                'tmdb_id' => $data['tmdb_id']
-            ],
-            [
-                'title' => $details['title'] ?? $details['name'],
-                'poster_path' => $details['poster_path'],
-                'vote_average' => $details['vote_average']
-            ]
-        );
+        if($listCount < 20) {
+            $media = $tmdb->details($data['tmdb_id'], $data['media_type']);
+    
+            UserMedia::updateOrCreate(
+                [
+                    'user_id' => auth('api')->id(),
+                    'list_type' => $list_type,
+                    'media_type' => $data['media_type'],
+                    'tmdb_id' => $data['tmdb_id']
+                ],
+                [
+                    'title' => $media['title'] ?? $media['name'],
+                    'poster_path' => $media['poster_path'],
+                    'vote_average' => $media['vote_average']
+                ]
+            );
+    
+            return response()->json([
+                'message' => 'Added',
+                'result' => $listCount + 1
+            ]);
+        }
 
-        return response()->json(['message' => 'Added']);
+        return response()->json([
+            'message' => 'limit reached'
+        ]);
     }
 
-    public function destroy(string $type, string $media_type, int $tmdb_id)
+    public function destroy(string $list_type, string $media_type, int $tmdb_id)
     {
-        UserMedia::where([
-            'user_id' => auth()->id(),
-            'list_type' => $type,
+        auth('api')->user()
+        ->userMedia()
+        ->where([
+            'list_type' => $list_type,
             'media_type' => $media_type,
             'tmdb_id' => $tmdb_id
-        ])->delete();
+            ])
+        ->delete();
 
-        return response()->json(['message' => 'Removed']);
+        return response()->json(['message' => 'Successfully Removed']);
     }
 }
